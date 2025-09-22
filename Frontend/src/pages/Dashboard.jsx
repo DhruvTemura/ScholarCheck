@@ -14,6 +14,9 @@ import {
   Eye,
   Download
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+const navigate = useNavigate();
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -51,20 +54,17 @@ const Dashboard = () => {
   ]);
 
   useEffect(() => {
-    // Get user data from localStorage (from JWT login)
     const userData = localStorage.getItem('user');
     if (userData) {
-      setUser(JSON.parse(userData));
-    } else {
-      // If no user data, redirect to login
-      window.location.href = '/login';
+        setUser(JSON.parse(userData));
     }
+    // ProtectedRoute will handle redirection
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/';
+    navigate('/');
   };
 
   const handleFileUpload = () => {
