@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FileText, CheckCircle, Shield, Zap, ArrowRight, BookOpen, Users, Award } from 'lucide-react';
 
 const Landing = () => {
@@ -15,12 +16,12 @@ const Landing = () => {
               <span className="text-xl font-bold text-slate-900">Academic Review AI</span>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="text-slate-600 hover:text-slate-900 px-4 py-2 rounded-md hover:bg-slate-100 transition-colors">
+              <Link to="/login" className="text-slate-600 hover:text-slate-900 px-4 py-2 rounded-md hover:bg-slate-100 transition-colors">
                 Login
-              </button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+              </Link>
+              <Link to="/signup" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                 Sign Up
-              </button>
+              </Link>
             </div>
           </div>
         </div>
