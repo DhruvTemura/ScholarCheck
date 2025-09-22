@@ -16,9 +16,9 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const navigate = useNavigate();
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [recentAnalyses, setRecentAnalyses] = useState([
     {
