@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 
 const Login = () => {
-  const navigate = useNavigate(); // React Router navigation hook
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -28,34 +28,51 @@ const Login = () => {
     setIsLoading(true);
     setMessage({ type: '', text: '' });
 
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setMessage({ type: 'error', text: 'Please fill in all fields.' });
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Replace this URL with your actual backend endpoint
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const data = await response.json();
+      // Mock authentication - simulate checking credentials
+      const mockUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+      const user = mockUsers.find(u => u.email === formData.email && u.password === formData.password);
 
-      if (response.ok) {
-        // Store JWT token in localStorage (or use a more secure method)
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+      if (user) {
+        // Mock successful login
+        const mockToken = `mock-jwt-token-${Date.now()}`;
+        const userData = {
+          id: user.id,
+          name: user.name,
+          email: user.email
+        };
+
+        // Store mock JWT token and user data
+        localStorage.setItem('token', mockToken);
+        localStorage.setItem('user', JSON.stringify(userData));
         
         setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
         
-        // Redirect to dashboard after a brief delay using React Router
+        // Redirect to dashboard after a brief delay
         setTimeout(() => {
           navigate('/dashboard');
         }, 1500);
       } else {
-        setMessage({ type: 'error', text: data.message || 'Login failed. Please try again.' });
+        // Check if user exists but password is wrong
+        const userExists = mockUsers.find(u => u.email === formData.email);
+        if (userExists) {
+          setMessage({ type: 'error', text: 'Invalid password. Please try again.' });
+        } else {
+          setMessage({ type: 'error', text: 'No account found with this email. Please sign up first.' });
+        }
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Network error. Please check your connection and try again.' });
+      setMessage({ type: 'error', text: 'An error occurred. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -74,6 +91,14 @@ const Login = () => {
           </div>
           <h2 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h2>
           <p className="text-slate-600">Sign in to your account to continue</p>
+        </div>
+
+        {/* Mock User Info */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <h3 className="font-medium text-blue-800 mb-2">Mock Authentication - Test Credentials:</h3>
+          <p className="text-sm text-blue-700">Email: test@example.com</p>
+          <p className="text-sm text-blue-700">Password: password123</p>
+          <p className="text-xs text-blue-600 mt-2">Or sign up to create a new mock account</p>
         </div>
 
         {/* Login Form */}
