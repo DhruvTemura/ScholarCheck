@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
 
 const Signup = () => {
-  const navigate = useNavigate(); // React Router navigation hook
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,6 +27,18 @@ const Signup = () => {
   };
 
   const validateForm = () => {
+    if (!formData.name.trim()) {
+      setMessage({ type: 'error', text: 'Please enter your full name.' });
+      return false;
+    }
+    if (!formData.email.trim()) {
+      setMessage({ type: 'error', text: 'Please enter your email address.' });
+      return false;
+    }
+    if (!formData.email.includes('@')) {
+      setMessage({ type: 'error', text: 'Please enter a valid email address.' });
+      return false;
+    }
     if (formData.password !== formData.confirmPassword) {
       setMessage({ type: 'error', text: 'Passwords do not match.' });
       return false;
@@ -47,37 +59,53 @@ const Signup = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      // Replace this URL with your actual backend endpoint
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password
-        })
-      });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store JWT token in localStorage (or use a more secure method)
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        setMessage({ type: 'success', text: 'Account created successfully! Redirecting...' });
-        
-        // Redirect to dashboard after a brief delay using React Router
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
-      } else {
-        setMessage({ type: 'error', text: data.message || 'Registration failed. Please try again.' });
+      // Mock user registration
+      const mockUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+      
+      // Check if user already exists
+      const existingUser = mockUsers.find(u => u.email === formData.email);
+      if (existingUser) {
+        setMessage({ type: 'error', text: 'An account with this email already exists. Please login instead.' });
+        setIsLoading(false);
+        return;
       }
+
+      // Create new mock user
+      const newUser = {
+        id: `user_${Date.now()}`,
+        name: formData.name,
+        email: formData.email,
+        password: formData.password, // In real app, this would be hashed!
+        createdAt: new Date().toISOString()
+      };
+
+      // Add to mock users array
+      mockUsers.push(newUser);
+      localStorage.setItem('mockUsers', JSON.stringify(mockUsers));
+
+      // Mock successful registration with auto-login
+      const mockToken = `mock-jwt-token-${Date.now()}`;
+      const userData = {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email
+      };
+
+      // Store mock JWT token and user data
+      localStorage.setItem('token', mockToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      setMessage({ type: 'success', text: 'Account created successfully! Redirecting...' });
+      
+      // Redirect to dashboard after a brief delay
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Network error. Please check your connection and try again.' });
+      setMessage({ type: 'error', text: 'An error occurred. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +124,13 @@ const Signup = () => {
           </div>
           <h2 className="text-3xl font-bold text-slate-900 mb-2">Create Account</h2>
           <p className="text-slate-600">Join thousands of students and researchers</p>
+        </div>
+
+        {/* Mock Info */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <h3 className="font-medium text-green-800 mb-2">Mock Authentication Mode</h3>
+          <p className="text-sm text-green-700">Create any account - it will be stored locally for testing</p>
+          <p className="text-xs text-green-600 mt-1">Use test@example.com / password123 or create new</p>
         </div>
 
         {/* Signup Form */}
@@ -175,7 +210,7 @@ const Signup = () => {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-colors"
+                  className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
